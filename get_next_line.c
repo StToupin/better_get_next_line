@@ -100,7 +100,6 @@ int					get_next_line(const int fd, char **line)
 		if ((of->buf_size = read(fd, of->buf, BUFF_SIZE)) == -1)
 			return (-1);
 		of->buf_pos = of->buf;
-		of->buf[of->buf_size] = 0;
 		of->eof = (of->buf_size == 0);
 	}
 	if (slist.len == 0 && of->eof == 0)

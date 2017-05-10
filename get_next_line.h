@@ -13,7 +13,7 @@
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
-# define BUFF_SIZE 1024
+# define BUFF_SIZE 32
 
 typedef struct	s_openfile
 {
@@ -21,7 +21,7 @@ typedef struct	s_openfile
 	int					first_call;
 	int					eof;
 	int					buf_size;
-	char				buf[BUFF_SIZE + 1];
+	char				buf[BUFF_SIZE];
 	char				*buf_pos;
 	struct s_openfile	*next;
 }				t_openfile;
