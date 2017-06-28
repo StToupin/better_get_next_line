@@ -15,56 +15,15 @@
 #include "slist.h"
 #include "get_next_line.h"
 
-static t_openfile	*get_openfile(t_openfile **oflist, int fd)
+void			get_next_line_init(t_openfile *of, int fd)
 {
-	t_openfile	*elem;
-	int			found;
-
-	elem = *oflist;
-	found = 0;
-	while (elem != NULL && !found)
-	{
-		if (elem->fd == fd)
-			found = 1;
-		else
-			elem = elem->next;
-	}
-	if (!found)
-	{
-		elem = (t_openfile*)malloc(sizeof(t_openfile));
-		if (elem == NULL)
-			return (NULL);
-		elem->fd = fd;
-		elem->first_call = 1;
-		elem->next = *oflist;
-		elem->buf_size = 0;
-		elem->buf_pos = elem->buf;
-		*oflist = elem;
-	}
-	return (elem);
+	of->fd = fd;
+	of->buf_size = 0;
+	of->buf_pos = of->buf;
+	of->eof = 0;
 }
 
-static int			del_openfile(t_openfile **oflist, int fd)
-{
-	t_openfile *elem;
-	t_openfile *prev;
-
-	elem = *oflist;
-	prev = NULL;
-	while (elem->fd != fd)
-	{
-		prev = elem;
-		elem = elem->next;
-	}
-	if (prev == NULL)
-		*oflist = elem->next;
-	else
-		prev->next = elem->next;
-	free(elem);
-	return (0);
-}
-
-static int			expand_str(t_slist *slist, t_openfile *of)
+static int		expand_str(t_slist *slist, t_openfile *of)
 {
 	int		keep_on_reading;
 	size_t	i;
@@ -83,21 +42,17 @@ static int			expand_str(t_slist *slist, t_openfile *of)
 	return (keep_on_reading);
 }
 
-int					get_next_line(const int fd, char **line)
+int				get_next_line(t_openfile *of, char **line)
 {
-	static t_openfile	*oflist = NULL;
-	t_openfile			*of;
 	t_slist				slist;
 
-	if (fd < 0 || line == NULL || (of = get_openfile(&oflist, fd)) == NULL)
+	if (of == NULL || of->fd < 0 || line == NULL)
 		return (-1);
 	*line = NULL;
-	if (of->eof == 1)
-		return (del_openfile(&oflist, fd));
 	slist_create(&slist);
 	while (of->eof == 0 && expand_str(&slist, of))
 	{
-		if ((of->buf_size = read(fd, of->buf, BUFF_SIZE)) == -1)
+		if ((of->buf_size = read(of->fd, of->buf, BUFF_SIZE)) == -1)
 			return (-1);
 		of->buf_pos = of->buf;
 		of->eof = (of->buf_size == 0);
@@ -105,7 +60,37 @@ int					get_next_line(const int fd, char **line)
 	if (slist.len == 0 && of->eof == 0)
 		return (-1);
 	if (of->eof && slist.len == 0)
-		return (del_openfile(&oflist, fd));
+		return (0);
 	*line = slist_join(&slist);
 	return (1);
+}
+
+void			write_next_line(t_openfile *of, char *line)
+{
+	if (of == NULL || of->fd < 0 || (line == NULL && of->eof != 1))
+		return ;
+	if (of->eof == 1 && of->buf_size > 0)
+	{
+		write(of->fd, of->buf, of->buf_size);
+		return ;
+	}
+	while (*line != '\0')
+	{
+		*(of->buf_pos)++ = *line++;
+		of->buf_size++;
+		if (of->buf_size == BUFF_SIZE)
+		{
+			write(of->fd, of->buf, of->buf_size);
+			of->buf_size = 0;
+			of->buf_pos = of->buf;
+		}
+	}
+	*(of->buf_pos)++ = '\n';
+	of->buf_size++;
+	if (of->buf_size == BUFF_SIZE)
+	{
+		write(of->fd, of->buf, of->buf_size);
+		of->buf_size = 0;
+		of->buf_pos = of->buf;
+	}
 }
