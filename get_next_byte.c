@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 
 #include <unistd.h>
-#include "get_next_byte.h"
+#include "get_next.h"
 
-void			get_next_byte_init(t_openfile *of, int fd)
+void			get_next_init(t_openfile *of, int fd)
 {
 	of->fd = fd;
 	of->buf_size = 0;

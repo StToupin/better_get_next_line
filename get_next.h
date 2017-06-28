@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   get_next.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: stoupin <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#ifndef GET_NEXT_H
+# define GET_NEXT_H
 
-# define BUFF_SIZE 8
+# define BUFF_SIZE 1024
 
 typedef struct	s_openfile
 {
@@ -24,8 +24,18 @@ typedef struct	s_openfile
 	char				*buf_pos;
 }				t_openfile;
 
-void			get_next_line_init(t_openfile *file, int fd);
+/*
+** From get_next_line.c
+*/
+
 int				get_next_line(t_openfile *of, char **line);
-void			write_next_line(t_openfile *of, char *line);
+
+/*
+** From get_next_byte.c
+*/
+
+void			get_next_init(t_openfile *file, int fd);
+int				get_next_byte(t_openfile *file, char *byte);
+void			write_next_byte(t_openfile *file, char byte);
 
 #endif

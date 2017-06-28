@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror -O0 -g -fsanitize=address	
 
 NAME_GNL = test_gnl
-OBJ_GNL = slist.o get_next_line.o test_gnl.o
+OBJ_GNL = slist.o get_next_byte.o get_next_line.o test_gnl.o
 SRC_GNL = $(OBJ_GNL:.o=.c)
 
 NAME_GNB = test_gnb
@@ -29,5 +29,5 @@ fclean: clean
 re: fclean all
 
 norminette:
-	norminette get_next_line.h slist.h get_next_line.c slist.c \
-				get_next_byte.h get_next_byte.c
+	norminette get_next.h slist.h get_next_line.c slist.c \
+				get_next_byte.c

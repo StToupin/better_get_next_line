@@ -12,7 +12,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
-#include "get_next_byte.h"
+#include "get_next.h"
 
 void	ft_putstr(char *str)
 {
@@ -48,8 +48,8 @@ int		main(int argc, char **argv)
 			ft_putstr("'.\n");
 			return (1);
 		}
-		get_next_byte_init(&of, fd);
-		get_next_byte_init(&of_out, 1);
+		get_next_init(&of, fd);
+		get_next_init(&of_out, 1);
 		while (get_next_byte(&of, &byte) == 1)
 			write_next_byte(&of_out, byte);
 		of_out.eof = 1;
